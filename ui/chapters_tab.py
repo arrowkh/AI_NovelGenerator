@@ -95,6 +95,10 @@ def load_chapter_content(self, chapter_number_str):
     content = read_file(chapter_file)
     self.chapter_view_text.delete("0.0", "end")
     self.chapter_view_text.insert("0.0", content)
+    
+    # 缓存章节内容用于撤销/重做
+    if hasattr(self, 'undo_redo'):
+        self.undo_redo.cache_chapter_content(chapter_number_str)
 
 def save_current_chapter(self):
     chapter_number_str = self.chapter_select_var.get()
@@ -106,9 +110,26 @@ def save_current_chapter(self):
         messagebox.showwarning("警告", "请先配置保存文件路径")
         return
     chapter_file = os.path.join(filepath, "chapters", f"chapter_{chapter_number_str}.txt")
-    content = self.chapter_view_text.get("0.0", "end").strip()
+    
+    # 获取旧内容和新内容
+    old_content = ""
+    if hasattr(self, 'undo_redo'):
+        old_content = self.undo_redo.get_cached_content(chapter_number_str)
+    
+    if not old_content and os.path.exists(chapter_file):
+        old_content = read_file(chapter_file)
+    
+    new_content = self.chapter_view_text.get("0.0", "end").strip()
+    
+    # 保存文件
     clear_file_content(chapter_file)
-    save_string_to_txt(content, chapter_file)
+    save_string_to_txt(new_content, chapter_file)
+    
+    # 记录操作到撤销/重做系统
+    if hasattr(self, 'undo_redo') and old_content != new_content:
+        self.undo_redo.record_chapter_edit(chapter_number_str, old_content, new_content)
+        self.undo_redo.cache_chapter_content(chapter_number_str)
+    
     self.safe_log(f"已保存对第 {chapter_number_str} 章的修改。")
 
 def prev_chapter(self):

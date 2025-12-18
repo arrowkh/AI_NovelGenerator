@@ -43,14 +43,35 @@ def load_novel_architecture(self):
     self.setting_text.delete("0.0", "end")
     self.setting_text.insert("0.0", content)
     self.log("已加载 Novel_architecture.txt 内容到编辑区。")
+    
+    # 缓存内容用于撤销/重做
+    if hasattr(self, 'undo_redo'):
+        self.undo_redo.content_cache['architecture'] = content
 
 def save_novel_architecture(self):
     filepath = self.filepath_var.get().strip()
     if not filepath:
         messagebox.showwarning("警告", "请先设置保存文件路径。")
         return
-    content = self.setting_text.get("0.0", "end").strip()
+    
+    # 获取旧内容和新内容
+    old_content = ""
+    if hasattr(self, 'undo_redo'):
+        old_content = self.undo_redo.content_cache.get('architecture', '')
+    
     filename = os.path.join(filepath, "Novel_architecture.txt")
+    if not old_content and os.path.exists(filename):
+        old_content = read_file(filename)
+    
+    new_content = self.setting_text.get("0.0", "end").strip()
+    
+    # 保存文件
     clear_file_content(filename)
-    save_string_to_txt(content, filename)
+    save_string_to_txt(new_content, filename)
+    
+    # 记录操作到撤销/重做系统
+    if hasattr(self, 'undo_redo') and old_content != new_content:
+        self.undo_redo.record_setting_edit('architecture', old_content, new_content)
+        self.undo_redo.content_cache['architecture'] = new_content
+    
     self.log("已保存对 Novel_architecture.txt 的修改。")
