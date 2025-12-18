@@ -1,0 +1,23 @@
+[
+  {
+    "example_id": "xiakemeng",
+    "title": "侠客梦",
+    "tagline": "完整网文示例（精简版）",
+    "genre": "玄幻/仙侠",
+    "chapters_included": 3
+  },
+  {
+    "example_id": "chunriwuyu",
+    "title": "春日物语",
+    "tagline": "言情文学示例（精简版）",
+    "genre": "言情/现代",
+    "chapters_included": 3
+  },
+  {
+    "example_id": "xingjilvtu",
+    "title": "星际旅途",
+    "tagline": "科幻示例（精简版）",
+    "genre": "科幻/未来",
+    "chapters_included": 3
+  }
+]
