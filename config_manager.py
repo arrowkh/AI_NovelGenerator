@@ -94,6 +94,11 @@ def create_config(config_file: str) -> dict:
         "webdav_url": "",
         "webdav_username": "",
         "webdav_password": ""
+    },
+    "onboarding": {
+        "completed": False,
+        "skipped": False,
+        "first_launch_at": ""
     }
 }
     save_config(config, config_file)

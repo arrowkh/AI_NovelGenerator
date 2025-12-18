@@ -1,0 +1,102 @@
+[
+  {
+    "template_id": "standard_webnovel_xuanhuan",
+    "name": "标准网文（玄幻/仙侠）",
+    "category": "玄幻/仙侠",
+    "description": "快速产出、节奏明快、爽点密集，适合连载型网文。",
+    "recommended_config": {
+      "interface_format": "OpenAI",
+      "base_url": "https://api.openai.com/v1",
+      "model_name": "gpt-4o-mini",
+      "temperature": 0.8,
+      "max_tokens": 8192,
+      "timeout": 600
+    },
+    "defaults": {
+      "per_chapter_words": 3000,
+      "planned_chapters": 500,
+      "planned_total_words": 500000
+    },
+    "estimate": {
+      "duration": "2周",
+      "chapters": 500,
+      "cost_usd": 45
+    },
+    "highlights": ["快速生成", "爽点足", "适合长篇连载"]
+  },
+  {
+    "template_id": "high_quality_romance_modern",
+    "name": "高质量文学（现代/言情）",
+    "category": "现代/言情",
+    "description": "重视人物情感与细节刻画，适合中短篇、精修型作品。",
+    "recommended_config": {
+      "interface_format": "OpenAI",
+      "base_url": "https://api.openai.com/v1",
+      "model_name": "gpt-4o",
+      "temperature": 0.7,
+      "max_tokens": 16384,
+      "timeout": 600
+    },
+    "defaults": {
+      "per_chapter_words": 4500,
+      "planned_chapters": 100,
+      "planned_total_words": 300000
+    },
+    "estimate": {
+      "duration": "4周",
+      "chapters": 100,
+      "cost_usd": 120
+    },
+    "highlights": ["细腻感伤", "细致刻画", "更高质量"]
+  },
+  {
+    "template_id": "fast_experiment_scifi",
+    "name": "快速实验（科幻/其他）",
+    "category": "科幻/其他",
+    "description": "零成本优先，适合快速验证灵感与流程（需要本地模型）。",
+    "recommended_config": {
+      "interface_format": "Ollama",
+      "base_url": "http://localhost:11434/v1",
+      "model_name": "qwen2.5:7b",
+      "temperature": 0.9,
+      "max_tokens": 8192,
+      "timeout": 600
+    },
+    "defaults": {
+      "per_chapter_words": 2500,
+      "planned_chapters": 20,
+      "planned_total_words": 50000
+    },
+    "estimate": {
+      "duration": "1天",
+      "chapters": 20,
+      "cost_usd": 0
+    },
+    "highlights": ["零成本", "快速尝试", "适合小样本迭代"]
+  },
+  {
+    "template_id": "pro_publishing_hybrid",
+    "name": "专业出版（全类型）",
+    "category": "全类型",
+    "description": "质量与成本的平衡方案，适合长周期创作与出版级整理。",
+    "recommended_config": {
+      "interface_format": "OpenAI",
+      "base_url": "https://api.openai.com/v1",
+      "model_name": "gpt-4o",
+      "temperature": 0.75,
+      "max_tokens": 16384,
+      "timeout": 600
+    },
+    "defaults": {
+      "per_chapter_words": 3500,
+      "planned_chapters": 200,
+      "planned_total_words": 350000
+    },
+    "estimate": {
+      "duration": "6周",
+      "chapters": 200,
+      "cost_usd": 80
+    },
+    "highlights": ["成本优化", "质量保证", "适合长期项目"]
+  }
+]

@@ -8,6 +8,7 @@ import customtkinter as ctk
 
 from config_manager import load_config, save_config
 from tooltips import tooltips
+from ui.hover_tooltip import attach_hover_tooltip
 
 import os
 
@@ -33,6 +34,7 @@ def create_label_with_help(self, parent, label_text, tooltip_key, row, column,
         command=lambda: messagebox.showinfo("参数说明", tooltips.get(tooltip_key, "暂无说明"))
     )
     btn.pack(side="left", padx=3)
+    attach_hover_tooltip(btn, tooltips.get(tooltip_key, ""))
 
     return frame
 

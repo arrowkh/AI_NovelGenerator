@@ -4,6 +4,7 @@ import os
 import threading
 import logging
 import traceback
+import datetime
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import filedialog, messagebox
@@ -36,6 +37,7 @@ from ui.character_tab import build_character_tab, load_character_state, save_cha
 from ui.summary_tab import build_summary_tab, load_global_summary, save_global_summary
 from ui.chapters_tab import build_chapters_tab, refresh_chapters_list, on_chapter_selected, load_chapter_content, save_current_chapter, prev_chapter, next_chapter
 from ui.other_settings import build_other_settings_tab
+from ui.onboarding_wizard import OnboardingWizard
 
 
 class NovelGeneratorGUI:
@@ -54,7 +56,9 @@ class NovelGeneratorGUI:
 
         # --------------- 配置文件路径 ---------------
         self.config_file = "config.json"
+        self._config_existed = os.path.exists(self.config_file)
         self.loaded_config = load_config(self.config_file)
+        self._ensure_onboarding_state()
 
         if self.loaded_config:
             last_llm = next(iter(self.loaded_config["llm_configs"].values())).get("interface_format", "OpenAI")
@@ -187,6 +191,9 @@ class NovelGeneratorGUI:
         # 添加菜单栏
         self._setup_menu()
 
+        # 首次启动自动显示新手引导（可跳过，之后可从菜单重新打开）
+        self.master.after(400, self._maybe_show_onboarding)
+
 
     def _setup_menu(self):
         """设置菜单栏"""
@@ -213,7 +220,62 @@ class NovelGeneratorGUI:
             accelerator="Ctrl+H",
             command=self.undo_redo.show_history_panel
         )
+
+        # 帮助菜单
+        help_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="帮助", menu=help_menu)
+        help_menu.add_command(label="新手教程", command=self.open_onboarding_wizard)
+        help_menu.add_separator()
+        help_menu.add_command(
+            label="关于",
+            command=lambda: messagebox.showinfo(
+                "关于",
+                "AI 小说生成器\n\n提示：可在帮助菜单中重新打开新手教程。",
+            ),
+        )
     
+    def _ensure_onboarding_state(self):
+        """确保配置中存在 onboarding 字段。
+
+        - 新创建的配置：默认未完成，引导会自动弹出
+        - 旧用户配置：默认视为已完成（避免打扰），仍可从菜单重新打开
+        """
+        onboarding = self.loaded_config.get("onboarding")
+        now = datetime.datetime.now().isoformat()
+
+        if onboarding is None:
+            if self._config_existed:
+                self.loaded_config["onboarding"] = {"completed": True, "skipped": True, "completed_at": now}
+            else:
+                self.loaded_config["onboarding"] = {"completed": False, "skipped": False, "first_launch_at": now}
+            save_config(self.loaded_config, self.config_file)
+        else:
+            # 兼容老字段
+            if "completed" not in onboarding:
+                onboarding["completed"] = True if self._config_existed else False
+            if "skipped" not in onboarding:
+                onboarding["skipped"] = False
+
+    def _maybe_show_onboarding(self):
+        onboarding = self.loaded_config.get("onboarding", {})
+        if not onboarding.get("completed", True):
+            self.open_onboarding_wizard()
+
+    def open_onboarding_wizard(self):
+        """从菜单打开新手教程，或首次启动自动弹出。"""
+        if hasattr(self, "_onboarding_window") and self._onboarding_window is not None:
+            try:
+                if self._onboarding_window.winfo_exists():
+                    self._onboarding_window.lift()
+                    return
+            except Exception:
+                pass
+
+        def _on_close():
+            self._onboarding_window = None
+
+        self._onboarding_window = OnboardingWizard(self, on_close=_on_close)
+
     # ----------------- 通用辅助函数 -----------------
     def show_tooltip(self, key: str):
         info_text = tooltips.get(key, "暂无说明")
