@@ -367,6 +367,11 @@ def finalize_chapter_ui(self):
                     edited_text = enriched
                     self.master.after(0, lambda: self.chapter_result.delete("0.0", "end"))
                     self.master.after(0, lambda: self.chapter_result.insert("0.0", edited_text))
+            # 记录旧内容用于撤销
+            old_content = ""
+            if os.path.exists(chapter_file):
+                old_content = read_file(chapter_file)
+            
             clear_file_content(chapter_file)
             save_string_to_txt(edited_text, chapter_file)
 
@@ -389,6 +394,15 @@ def finalize_chapter_ui(self):
             self.safe_log(f"✅ 第{chap_num}章定稿完成（已更新前文摘要、角色状态、向量库）。")
 
             final_text = read_file(chapter_file)
+            
+            # 记录到撤销/重做系统
+            if hasattr(self, 'undo_redo'):
+                self.undo_redo.record_chapter_generation(
+                    str(chap_num), 
+                    final_text, 
+                    len(final_text)
+                )
+            
             self.master.after(0, lambda: self.show_chapter_in_textbox(final_text))
         except Exception:
             self.handle_exception("定稿章节时出错")

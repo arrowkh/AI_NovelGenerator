@@ -15,6 +15,7 @@ from utils import read_file, save_string_to_txt, clear_file_content
 from tooltips import tooltips
 
 from ui.context_menu import TextWidgetContextMenu
+from ui.undo_redo_integration import UndoRedoIntegration
 from ui.main_tab import build_main_tab, build_left_layout, build_right_layout
 from ui.config_tab import build_config_tabview, load_config_btn, save_config_btn
 from ui.novel_params_tab import build_novel_params_area, build_optional_buttons_area
@@ -178,8 +179,41 @@ class NovelGeneratorGUI:
         build_summary_tab(self)
         build_chapters_tab(self)
         build_other_settings_tab(self)
+        
+        # 初始化撤销/重做系统
+        self.undo_redo = UndoRedoIntegration(self)
+        self.undo_redo.setup_shortcuts()
+        
+        # 添加菜单栏
+        self._setup_menu()
 
 
+    def _setup_menu(self):
+        """设置菜单栏"""
+        menubar = tk.Menu(self.master)
+        self.master.config(menu=menubar)
+        
+        # 编辑菜单
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="编辑", menu=edit_menu)
+        
+        edit_menu.add_command(
+            label="撤销",
+            accelerator="Ctrl+Z",
+            command=self.undo_redo.undo
+        )
+        edit_menu.add_command(
+            label="重做",
+            accelerator="Ctrl+Y",
+            command=self.undo_redo.redo
+        )
+        edit_menu.add_separator()
+        edit_menu.add_command(
+            label="操作历史",
+            accelerator="Ctrl+H",
+            command=self.undo_redo.show_history_panel
+        )
+    
     # ----------------- 通用辅助函数 -----------------
     def show_tooltip(self, key: str):
         info_text = tooltips.get(key, "暂无说明")

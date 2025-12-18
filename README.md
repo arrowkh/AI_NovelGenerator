@@ -14,6 +14,7 @@
 | 🔍 语义检索引擎    | 基于向量的长程上下文一致性维护      |
 | 📚 知识库集成      | 支持本地文档参考         |
 | ✅ 自动审校机制    | 检测剧情矛盾与逻辑冲突          |
+| ⏮️ 撤销/重做系统   | 完整的操作历史追踪与时间旅行功能    |
 | 🖥 可视化工作台    | 全流程GUI操作，配置/生成/审校一体化 |
 
 </div>
@@ -86,8 +87,13 @@ novel-generator/
 ├── utils.py                     # 常用工具函数, 文件操作
 ├── config_manager.py            # 管理配置 (API Key, Base URL)
 ├── config.json                  # 用户配置文件 (可选)
+├── core/                        # 核心功能模块
+│   ├── undo_redo_manager.py    # 撤销/重做管理器
+│   └── README_UNDO_REDO.md     # 撤销/重做文档
 ├── novel_generator/             # 章节生成核心逻辑
 ├── ui/                          # 图形界面
+│   ├── undo_redo_panel.py      # 撤销/重做UI面板
+│   └── undo_redo_integration.py # 撤销/重做集成
 └── vectorstore/                 # (可选) 本地向量数据库存储
 ```
 
@@ -201,6 +207,13 @@ pyinstaller main.spec
 
 7. **重复第 4-6 步** 直到所有章节生成并定稿！
 
+8. **使用撤销/重做功能**
+   - **Ctrl+Z**: 撤销上一个操作
+   - **Ctrl+Y**: 重做被撤销的操作
+   - **Ctrl+H**: 打开操作历史面板
+   - **编辑菜单**: 访问撤销/重做和操作历史
+   - 详细使用说明请参考 [撤销/重做使用指南](UNDO_REDO_USAGE_GUIDE.md)
+
 > **向量检索配置提示**  
 > 1. embedding模型需要显示指定接口和模型名称；
 > 2. 使用**本地Ollama**的**Embedding**时需提前启动Ollama服务：  
@@ -210,6 +223,13 @@ pyinstaller main.spec
 >    ```
 > 3. 切换不同Embedding模型后建议清空vectorstore目录
 > 4. 云端Embedding需确保对应API权限已开通
+
+> **撤销/重做功能提示**
+> 1. 所有编辑和生成操作都会被自动记录
+> 2. 操作历史会保存到项目目录的 `.undo_redo_history.pkl` 文件中
+> 3. 支持分支管理功能，可以尝试不同的修改方向
+> 4. 最多保留 1000 条操作记录
+> 5. 详细使用说明请参考 [撤销/重做使用指南](UNDO_REDO_USAGE_GUIDE.md)
 
 ---
 
